@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-native-drag-out"
+description = "Enables the native_drag_out command without any pre-configured scope."
+commands.allow = ["native_drag_out"]
+
+[[permission]]
+identifier = "deny-native-drag-out"
+description = "Denies the native_drag_out command without any pre-configured scope."
+commands.deny = ["native_drag_out"]
