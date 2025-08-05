@@ -32,7 +32,7 @@ objc2 = { version = "0.5", optional = true }
 objc2-app-kit = { version = "0.5", optional = true }
 
 # Optional BlitzArch archive extractor backend
-blitzarch = { version = "0.2", optional = true }
+
 
 
 
@@ -45,7 +45,7 @@ blitzarch = { version = "0.2", optional = true }
 default = []
 
 objc2_backend = ["objc2", "objc2-app-kit"]
-blitzarch_backend = ["blitzarch"]
+
 
 [lib]
 crate-type = ["staticlib", "cdylib", "rlib"]
