@@ -30,10 +30,21 @@ When your project is built with the `blitzarch_backend` feature, the plugin uses
 archives on-the-fly. Disable the feature to remove that dependency and provide
 your own extraction logic.
 
+### Installation
+
+Add the crate via Cargo:
+
+```bash
+cargo add tauri-plugin-dragout@0.1
+```
+
+or manually in your `Cargo.toml`:
+
 ```toml
 [dependencies]
 tauri-plugin-dragout = { version = "0.1", default-features = false }
 ```
+
 
 ---
 
