@@ -1,0 +1,22 @@
+{
+  "name": "tauri-plugin-dragout-api",
+  "version": "0.2.0",
+  "description": "JavaScript API for tauri-plugin-dragout: native drag-out of files and generated content from a Tauri 2 webview.",
+  "license": "MIT OR Apache-2.0",
+  "repository": "github:alexqqqqqq777/tauri-plugin-dragout",
+  "type": "module",
+  "main": "guest-js/index.js",
+  "module": "guest-js/index.js",
+  "types": "guest-js/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./guest-js/index.d.ts",
+      "default": "./guest-js/index.js"
+    }
+  },
+  "files": ["guest-js"],
+  "keywords": ["tauri", "tauri-plugin", "drag-and-drop", "macos", "file-promise"],
+  "peerDependencies": {
+    "@tauri-apps/api": "^2.0.0"
+  }
+}

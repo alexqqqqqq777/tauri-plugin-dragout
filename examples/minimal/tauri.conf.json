@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "dragout-example",
+  "version": "0.2.0",
+  "identifier": "dev.dragout.example",
+  "build": { "frontendDist": "dist" },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [{ "title": "Drag-out demo", "width": 560, "height": 420 }],
+    "security": { "csp": null }
+  },
+  "bundle": { "active": false }
+}

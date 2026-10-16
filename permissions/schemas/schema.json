@@ -295,22 +295,34 @@
       "type": "string",
       "oneOf": [
         {
-          "description": "Enables the native_drag_out command without any pre-configured scope.",
+          "description": "Enables the is_supported command without any pre-configured scope.",
           "type": "string",
-          "const": "allow-native-drag-out",
-          "markdownDescription": "Enables the native_drag_out command without any pre-configured scope."
+          "const": "allow-is-supported",
+          "markdownDescription": "Enables the is_supported command without any pre-configured scope."
         },
         {
-          "description": "Denies the native_drag_out command without any pre-configured scope.",
+          "description": "Denies the is_supported command without any pre-configured scope.",
           "type": "string",
-          "const": "deny-native-drag-out",
-          "markdownDescription": "Denies the native_drag_out command without any pre-configured scope."
+          "const": "deny-is-supported",
+          "markdownDescription": "Denies the is_supported command without any pre-configured scope."
         },
         {
-          "description": "Разрешения по умолчанию для плагина dragout, включающие команду native_drag_out.\n#### This default permission set includes:\n\n- `allow-native-drag-out`",
+          "description": "Enables the start_drag command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-start-drag",
+          "markdownDescription": "Enables the start_drag command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the start_drag command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-start-drag",
+          "markdownDescription": "Denies the start_drag command without any pre-configured scope."
+        },
+        {
+          "description": "Allows starting a native drag-out session and checking whether it is supported on this platform.\n#### This default permission set includes:\n\n- `allow-start-drag`\n- `allow-is-supported`",
           "type": "string",
           "const": "default",
-          "markdownDescription": "Разрешения по умолчанию для плагина dragout, включающие команду native_drag_out.\n#### This default permission set includes:\n\n- `allow-native-drag-out`"
+          "markdownDescription": "Allows starting a native drag-out session and checking whether it is supported on this platform.\n#### This default permission set includes:\n\n- `allow-start-drag`\n- `allow-is-supported`"
         }
       ]
     }

@@ -1,8 +1,14 @@
 [package]
 name = "dragout-example"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
+publish = false
+
+[workspace]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = "2"
-tauri-plugin-dragout = { path = "../../" }
+tauri = { version = "2", features = [] }
+tauri-plugin-dragout = { path = "../.." }
