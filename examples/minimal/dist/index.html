@@ -29,6 +29,7 @@
     el.addEventListener('dragstart', (e) => e.preventDefault());
     el.addEventListener('pointerdown', (down) => {
       if (down.button !== 0) return;
+      down.preventDefault(); // no text selection before the drag starts
       const move = (e) => {
         if (Math.hypot(e.clientX - down.clientX, e.clientY - down.clientY) < 4) return;
         window.removeEventListener('pointermove', move);

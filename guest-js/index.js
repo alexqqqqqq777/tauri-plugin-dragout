@@ -106,6 +106,8 @@ export function draggable(element, items, options = {}) {
 
   const onDown = (event) => {
     if (event.button !== 0) return;
+    // Keep WebKit from starting a text selection before the drag threshold is reached.
+    event.preventDefault();
     origin = { x: event.clientX, y: event.clientY };
     window.addEventListener('pointermove', onMove, true);
     window.addEventListener('pointerup', stop, true);
