@@ -42,6 +42,25 @@ Typical uses:
 * cloud drives that download on drop;
 * dev tools that let users drag logs, screenshots or exports out.
 
+## Why dragout
+
+* **Files that do not exist yet.** Other drag plugins can only drag a path that is
+  already on disk. With dragout, nothing is written until the user drops, and then
+  the file goes straight into the folder they chose. There are no temporary copies
+  and no "Save as…" dialog.
+* **No Rust needed for generated content.** A Blob, a canvas or bytes from your
+  frontend become a real file on drop.
+* **Your app learns where the file landed.** The `dropped` event carries the final
+  path, so you can show "Saved to Desktop" or open the folder.
+* **Slow work is fine.** Promises run on a background queue, so an extract, a decrypt
+  or a download does not freeze the UI. Finder shows the file as in progress.
+* **Safe by default.** A path filter limits what the frontend may drag, and the drag
+  cannot land back in your own window. Panics and Objective-C exceptions become
+  errors instead of crashing the app.
+* **One call, one code path.** `draggable(el, item)` covers the usual gotchas, and
+  TypeScript types are included. The crate builds on every platform, and
+  `isSupported()` tells the frontend when to fall back.
+
 ## Features
 
 | Item | What the drop target gets | When the work happens |
