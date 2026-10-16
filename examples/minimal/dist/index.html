@@ -13,6 +13,7 @@
 </head>
 <body>
   <h3>Drag a tile to Finder, the Desktop or Mail</h3>
+  <p><small>Dropping a file from Finder onto this window logs "window received".</small></p>
   <div class="tile" id="data">Generated note<br><small>bytes from JS</small></div>
   <div class="tile" id="promise">Report<br><small>rendered in Rust on drop</small></div>
   <div class="tile" id="file">Existing file<br><small>path below</small></div>
@@ -49,6 +50,8 @@
   listen('dragout://dropped', (e) => log('dropped ' + JSON.stringify(e.payload)));
   listen('dragout://ended', (e) => log('ended ' + JSON.stringify(e.payload)));
   listen('dragout://error', (e) => log('failed ' + JSON.stringify(e.payload)));
+  // Files dropped INTO this window (Tauri's own drag-drop). It must keep working after a drag-out.
+  listen('tauri://drag-drop', (e) => log('window received ' + JSON.stringify(e.payload.paths)));
 </script>
 </body>
 </html>
