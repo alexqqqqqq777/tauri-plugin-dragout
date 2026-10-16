@@ -10,6 +10,8 @@ Slack, Telegram or any other app. That works for files on disk, for bytes your
 frontend just generated, and for files that only come into existence when the user
 drops them.
 
+<p align="center"><img src="https://raw.githubusercontent.com/alexqqqqqq777/tauri-plugin-dragout/main/docs/demo.gif" width="900" alt="Animation: a promised PDF, bytes from JS and a copied photo are dragged from a Tauri app window into Finder; each file is written on drop and the app logs its final path"></p>
+
 ```js
 import { draggable } from 'tauri-plugin-dragout-api';
 

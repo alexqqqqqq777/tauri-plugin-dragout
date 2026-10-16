@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 900px; height: 440px; overflow: hidden; }
+  body { background: #eef1f5; font: 14px -apple-system, "Segoe UI", system-ui, sans-serif; color: #1d2433; position: relative; }
+  .caption { position: absolute; left: 0; right: 0; top: 14px; text-align: center; font-size: 15px; color: #4a5568; }
+  .caption b { color: #1d2433; }
+  .win { position: absolute; top: 48px; height: 330px; background: #fff; border-radius: 12px;
+         box-shadow: 0 8px 30px rgba(20,30,50,.14), 0 0 0 1px rgba(20,30,50,.08); overflow: hidden; }
+  .bar { height: 34px; background: #f6f7f9; border-bottom: 1px solid #e3e6eb; display: flex; align-items: center; padding: 0 12px; gap: 7px; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; background: #d5d9e0; }
+  .title { margin-left: 10px; font-size: 13px; color: #5b6475; }
+  #app { left: 36px; width: 420px; }
+  #finder { left: 492px; width: 372px; transition: none; }
+  #finder.target { box-shadow: 0 8px 30px rgba(20,30,50,.14), 0 0 0 3px #3b82f6; }
+  .tiles { padding: 18px; display: flex; gap: 12px; }
+  .tile { width: 118px; height: 112px; border: 1px solid #dfe3ea; border-radius: 10px; background: #fafbfc;
+          display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+  .tile small { color: #7a8394; font-size: 11px; }
+  .tile.lift { box-shadow: 0 6px 16px rgba(20,30,50,.18); transform: translateY(-2px); }
+  .doc { width: 34px; height: 42px; border-radius: 4px; position: relative; background: #fff; border: 1.5px solid #9aa4b5; }
+  .doc::after { content: ""; position: absolute; left: 6px; right: 6px; top: 12px; height: 2px; background: #c3cad6;
+                box-shadow: 0 6px 0 #c3cad6, 0 12px 0 #c3cad6; }
+  .doc.pdf { border-color: #e05a47; } .doc.md { border-color: #3b82f6; } .doc.zip { border-color: #8b5cf6; }
+  .log { position: absolute; left: 0; right: 0; bottom: 0; height: 120px; border-top: 1px solid #e3e6eb; background: #fbfbfc;
+         padding: 10px 14px; font: 12px ui-monospace, "SF Mono", Menlo, monospace; color: #4a5568; line-height: 1.7; }
+  .log .ev { color: #16794a; } .log .k { color: #8b5cf6; }
+  .files { padding: 22px; display: flex; gap: 26px; flex-wrap: wrap; }
+  .file { width: 84px; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12px; opacity: 0; }
+  .file .doc { width: 44px; height: 54px; }
+  .ring { position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%;
+          border: 3px solid #dbe4f3; border-top-color: #3b82f6; }
+  .ghost { position: absolute; width: 64px; height: 76px; border-radius: 10px; background: rgba(255,255,255,.85);
+           box-shadow: 0 10px 26px rgba(20,30,50,.25); display: flex; align-items: center; justify-content: center; opacity: 0; }
+  .plus { position: absolute; right: -6px; bottom: -6px; width: 20px; height: 20px; border-radius: 50%; background: #22c55e;
+          color: #fff; font: bold 15px/20px system-ui; text-align: center; opacity: 0; }
+  #cursor { position: absolute; width: 22px; height: 30px; }
+  .foot { position: absolute; left: 0; right: 0; bottom: 18px; text-align: center; font: 13px ui-monospace, Menlo, monospace; color: #5b6475; }
+</style>
+</head>
+<body>
+  <div class="caption"><b>tauri-plugin-dragout</b> · drag files out of your webview, even ones written only on drop</div>
+
+  <div class="win" id="app">
+    <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">Your Tauri app</span></div>
+    <div class="tiles">
+      <div class="tile" id="t1"><div class="doc pdf"></div>Report.pdf<small>promise · on drop</small></div>
+      <div class="tile" id="t2"><div class="doc md"></div>notes.md<small>data · from JS</small></div>
+      <div class="tile" id="t3"><div class="doc zip"></div>photo.jpg<small>copy · on drop</small></div>
+    </div>
+    <div class="log" id="log"></div>
+  </div>
+
+  <div class="win" id="finder">
+    <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">Finder — Desktop</span></div>
+    <div class="files">
+      <div class="file" id="f1"><div class="doc pdf" style="position:relative"><div class="ring" id="r1"></div></div><span id="n1">Report.pdf</span></div>
+      <div class="file" id="f2"><div class="doc md"></div>notes.md</div>
+      <div class="file" id="f3"><div class="doc zip" style="position:relative"><div class="ring" id="r3"></div></div><span id="n3">photo.jpg</span></div>
+    </div>
+  </div>
+
+  <div class="ghost" id="ghost"><div class="doc" id="gdoc"></div><div class="plus" id="plus">+</div></div>
+  <svg id="cursor" viewBox="0 0 22 30"><path d="M2 2 L2 24 L8 18.5 L12 28 L16 26.2 L12 17 L20 17 Z" fill="#111" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>
+
+  <div class="foot">draggable(el, { type: 'promise' | 'data' | 'copy' | 'file', … })</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const ease = (x) => x < 0 ? 0 : x > 1 ? 1 : x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+const lerp = (a, b, x) => a + (b - a) * x;
+const seg = (t, a, b) => ease((t - a) / (b - a));
+const center = (el) => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
+
+const P = {
+  rest: [790, 330],
+  t1: center($('t1')), t2: center($('t2')), t3: center($('t3')),
+  f1: center($('f1')), f2: center($('f2')), f3: center($('f3')),
+};
+
+// One drag: [start, grab, drop, release, written]
+const DRAGS = [
+  { from: 't1', to: 'f1', file: 'f1', ring: 'r1', cls: 'pdf', at: 0.5, write: 0.9,
+    log: '<span class="ev">dropped</span> Report.pdf → <span class="k">~/Desktop/Report.pdf</span>' },
+  { from: 't2', to: 'f2', file: 'f2', ring: null, cls: 'md', at: 3.3, write: 0.05,
+    log: '<span class="ev">dropped</span> notes.md → <span class="k">~/Desktop/notes.md</span>' },
+  { from: 't3', to: 'f3', file: 'f3', ring: 'r3', cls: 'zip', at: 5.4, write: 0.6,
+    log: '<span class="ev">dropped</span> photo.jpg → <span class="k">~/Desktop/photo.jpg</span>' },
+];
+const MOVE = 0.45, PRESS = 0.15, CARRY = 1.1;
+
+function render(t) {
+  let cur = P.rest, ghost = null, target = false, lifted = null, lines = [];
+  let prevEnd = P.rest;
+  for (const d of DRAGS) {
+    const a = d.at, g = a + MOVE, s = g + PRESS, e = s + CARRY;
+    const src = P[d.from], dst = P[d.to];
+    if (t >= a && t < g) cur = [lerp(prevEnd[0], src[0], seg(t, a, g)), lerp(prevEnd[1], src[1], seg(t, a, g))];
+    if (t >= g && t < s) { cur = src; lifted = d.from; }
+    if (t >= s && t < e) {
+      const x = seg(t, s, e);
+      cur = [lerp(src[0], dst[0], x), lerp(src[1], dst[1], x) + Math.sin(x * Math.PI) * 28];
+      ghost = { pos: cur, cls: d.cls, plus: x > 0.72 };
+      target = x > 0.72;
+    }
+    if (t >= e) { cur = dst; prevEnd = dst; }
+    // file appears after the drop; promises show a spinner while they write
+    const f = $(d.file);
+    if (t < e) { f.style.opacity = 0; }
+    else {
+      const w = (t - e) / d.write;
+      f.style.opacity = w >= 1 ? 1 : 0.45;
+      if (d.ring) { $('n' + d.ring.slice(1)).textContent = w >= 1 ? $(d.from).childNodes[1].textContent : 'writing…'; $(d.ring).style.display = w >= 1 ? 'none' : 'block'; $(d.ring).style.transform = `rotate(${t * 720}deg)`; }
+      if (w >= 1) lines.push(d.log);
+    }
+  }
+  const last = DRAGS[DRAGS.length - 1], end = last.at + MOVE + PRESS + CARRY;
+  if (t > end + 0.2) cur = [lerp(P.f3[0], P.rest[0], seg(t, end + 0.2, end + 0.8)), lerp(P.f3[1], P.rest[1], seg(t, end + 0.2, end + 0.8))];
+
+  for (const id of ['t1', 't2', 't3']) $(id).classList.toggle('lift', lifted === id || (ghost && false));
+  $('finder').classList.toggle('target', target);
+  const gh = $('ghost');
+  if (ghost) {
+    gh.style.opacity = 1; gh.style.left = (ghost.pos[0] - 32) + 'px'; gh.style.top = (ghost.pos[1] - 38) + 'px';
+    $('gdoc').className = 'doc ' + ghost.cls; $('plus').style.opacity = ghost.plus ? 1 : 0;
+  } else gh.style.opacity = 0;
+  const c = $('cursor'); c.style.left = (cur[0] - 2) + 'px'; c.style.top = (cur[1] - 2) + 'px';
+  $('log').innerHTML = lines.map((l) => '› ' + l).join('<br>');
+}
+window.DURATION = DRAGS[2].at + MOVE + PRESS + CARRY + 2.4;
+render(0);
+</script>
+</body>
+</html>
