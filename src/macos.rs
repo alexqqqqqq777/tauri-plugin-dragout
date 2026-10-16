@@ -63,6 +63,9 @@ where
 
 static PROMISES: OnceLock<Mutex<HashMap<String, Pending>>> = OnceLock::new();
 static SESSIONS: OnceLock<Mutex<HashMap<u64, SessionState>>> = OnceLock::new();
+/// A view whose drop registration is suspended, and the dragged types it had.
+type SuspendedView = (usize, usize);
+static SUSPENDED: OnceLock<Mutex<HashMap<u64, Vec<SuspendedView>>>> = OnceLock::new();
 
 pub(crate) fn is_main_thread() -> bool {
     unsafe {
@@ -135,6 +138,9 @@ unsafe fn begin(
         session,
         SessionState { delegate: delegate as usize, pending: promise_count, ended: false },
     );
+    if !options.allow_self_drop {
+        suspend_drop_targets(session, view);
+    }
 
     let size = options.icon_size.unwrap_or(64.0).clamp(16.0, 512.0);
     let custom_icon = custom_icon(options);
@@ -307,8 +313,50 @@ fn drop_promises_of(session: u64) {
     lock(&PROMISES).retain(|_, p| p.session != session);
 }
 
-/// Drop everything of a session that failed to start.
+/// WKWebView accepts a drop whatever operation mask the source reports, so the
+/// mask alone cannot keep a drag out of its own window. Instead, the window's
+/// views stop accepting drops until the drag ends. Must run on the main thread.
+unsafe fn suspend_drop_targets(session: u64, root: id) {
+    let mut saved = Vec::new();
+    let mut stack = vec![root];
+    while let Some(view) = stack.pop() {
+        let types: id = msg_send![view, registeredDraggedTypes];
+        let count: usize = if types == nil { 0 } else { msg_send![types, count] };
+        if count > 0 {
+            let types: id = msg_send![types, copy];
+            let _: id = msg_send![view, retain];
+            let _: () = msg_send![view, unregisterDraggedTypes];
+            saved.push((view as usize, types as usize));
+        }
+        let subviews: id = msg_send![view, subviews];
+        let children: usize = if subviews == nil { 0 } else { msg_send![subviews, count] };
+        for i in 0..children {
+            let child: id = msg_send![subviews, objectAtIndex: i];
+            stack.push(child);
+        }
+    }
+    if !saved.is_empty() {
+        lock(&SUSPENDED).insert(session, saved);
+    }
+}
+
+/// Give the views back the drop registration taken by `suspend_drop_targets`.
+/// Must run on the main thread.
+fn restore_drop_targets(session: u64) {
+    let Some(saved) = lock(&SUSPENDED).remove(&session) else { return };
+    for (view, types) in saved {
+        unsafe {
+            let (view, types) = (view as id, types as id);
+            let _: () = msg_send![view, registerForDraggedTypes: types];
+            let _: () = msg_send![types, release];
+            let _: () = msg_send![view, release];
+        }
+    }
+}
+
+/// Drop everything of a session that failed to start. Runs on the main thread.
 fn forget_session(session: u64) {
+    restore_drop_targets(session);
     drop_promises_of(session);
     if let Some(state) = lock(&SESSIONS).remove(&session) {
         release_delegate(state.delegate);
@@ -462,6 +510,7 @@ extern "C" fn ended_at_point(this: &Object, _sel: Sel, _session: id, _point: NSP
             o if o & 32 != 0 => "delete",
             _ => "other",
         };
+        restore_drop_targets(session);
         emit(
             EVENT_ENDED,
             json!({ "session": session, "operation": operation, "cancelled": op == 0 }),
