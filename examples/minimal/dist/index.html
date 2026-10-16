@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Drag-out demo</title>
+<style>
+  body { font: 14px -apple-system, system-ui, sans-serif; margin: 24px; color: #222; }
+  .tile { display: inline-block; width: 150px; padding: 18px 12px; margin: 6px; border: 1px solid #ccc;
+          border-radius: 10px; text-align: center; cursor: grab; user-select: none; background: #fafafa; }
+  input { width: 100%; box-sizing: border-box; margin-top: 8px; }
+  #log { margin-top: 16px; font: 12px ui-monospace, monospace; white-space: pre-wrap; color: #555; }
+</style>
+</head>
+<body>
+  <h3>Drag a tile to Finder, the Desktop or Mail</h3>
+  <div class="tile" id="data">Generated note<br><small>bytes from JS</small></div>
+  <div class="tile" id="promise">Report<br><small>rendered in Rust on drop</small></div>
+  <div class="tile" id="file">Existing file<br><small>path below</small></div>
+  <input id="path" placeholder="/absolute/path/to/a/file.pdf">
+  <div id="log"></div>
+<script>
+  const { invoke } = window.__TAURI__.core;
+  const { listen } = window.__TAURI__.event;
+  const log = (m) => (document.getElementById('log').textContent += m + '\n');
+
+  // Minimal version of `draggable()` from tauri-plugin-dragout-api.
+  function draggable(el, start) {
+    el.addEventListener('dragstart', (e) => e.preventDefault());
+    el.addEventListener('pointerdown', (down) => {
+      if (down.button !== 0) return;
+      const move = (e) => {
+        if (Math.hypot(e.clientX - down.clientX, e.clientY - down.clientY) < 4) return;
+        window.removeEventListener('pointermove', move);
+        start().then((s) => log('drag started ' + JSON.stringify(s)), (err) => log('error: ' + err));
+      };
+      window.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', () => window.removeEventListener('pointermove', move), { once: true });
+    });
+  }
+
+  draggable(document.getElementById('data'), () =>
+    invoke('plugin:dragout|start_drag', {
+      items: [{ type: 'data', fileName: 'note.txt', data: btoa('Hello from the webview!\n') }],
+    }));
+  draggable(document.getElementById('promise'), () => invoke('drag_report'));
+  draggable(document.getElementById('file'), () =>
+    invoke('plugin:dragout|start_drag', { items: [{ type: 'file', path: document.getElementById('path').value }] }));
+
+  listen('dragout://dropped', (e) => log('dropped ' + JSON.stringify(e.payload)));
+  listen('dragout://ended', (e) => log('ended ' + JSON.stringify(e.payload)));
+  listen('dragout://error', (e) => log('failed ' + JSON.stringify(e.payload)));
+</script>
+</body>
+</html>

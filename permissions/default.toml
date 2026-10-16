@@ -1,5 +1,5 @@
 "$schema" = "schemas/schema.json"
 
 [default]
-description = "Разрешения по умолчанию для плагина dragout, включающие команду native_drag_out."
-permissions = ["allow-native-drag-out"]
+description = "Allows starting a native drag-out session and checking whether it is supported on this platform."
+permissions = ["allow-start-drag", "allow-is-supported"]

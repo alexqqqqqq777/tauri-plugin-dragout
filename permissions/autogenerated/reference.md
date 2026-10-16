@@ -1,10 +1,11 @@
 ## Default Permission
 
-Разрешения по умолчанию для плагина dragout, включающие команду native_drag_out.
+Allows starting a native drag-out session and checking whether it is supported on this platform.
 
 #### This default permission set includes the following:
 
-- `allow-native-drag-out`
+- `allow-start-drag`
+- `allow-is-supported`
 
 ## Permission Table
 
@@ -18,12 +19,12 @@
 <tr>
 <td>
 
-`dragout:allow-native-drag-out`
+`dragout:allow-is-supported`
 
 </td>
 <td>
 
-Enables the native_drag_out command without any pre-configured scope.
+Enables the is_supported command without any pre-configured scope.
 
 </td>
 </tr>
@@ -31,12 +32,38 @@ Enables the native_drag_out command without any pre-configured scope.
 <tr>
 <td>
 
-`dragout:deny-native-drag-out`
+`dragout:deny-is-supported`
 
 </td>
 <td>
 
-Denies the native_drag_out command without any pre-configured scope.
+Denies the is_supported command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`dragout:allow-start-drag`
+
+</td>
+<td>
+
+Enables the start_drag command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`dragout:deny-start-drag`
+
+</td>
+<td>
+
+Denies the start_drag command without any pre-configured scope.
 
 </td>
 </tr>
