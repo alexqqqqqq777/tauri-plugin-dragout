@@ -5,13 +5,29 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write
+
 jobs:
   publish:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - name: Check that the tag matches Cargo.toml
+        run: |
+          crate="$(cargo metadata --no-deps --format-version 1 | python3 -c 'import json,sys; print(json.load(sys.stdin)["packages"][0]["version"])')"
+          test "v$crate" = "$GITHUB_REF_NAME" || { echo "tag $GITHUB_REF_NAME does not match version $crate"; exit 1; }
       - name: Publish to crates.io
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo publish --verbose --no-verify
+        run: |
+          test -n "$CARGO_REGISTRY_TOKEN" || { echo "Add the CARGO_REGISTRY_TOKEN repository secret first"; exit 1; }
+          cargo publish --verbose
+      - name: GitHub release with notes from CHANGELOG.md
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="[$version]" 'index($0, "## ") == 1 { p = index($0, v) > 0; next } p' CHANGELOG.md > notes.md
+          gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md

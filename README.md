@@ -1,7 +1,9 @@
 # tauri-plugin-dragout
 
 [![Crates.io](https://img.shields.io/crates/v/tauri-plugin-dragout.svg)](https://crates.io/crates/tauri-plugin-dragout)
+[![docs.rs](https://img.shields.io/docsrs/tauri-plugin-dragout)](https://docs.rs/tauri-plugin-dragout)
 [![CI](https://github.com/alexqqqqqq777/tauri-plugin-dragout/actions/workflows/ci.yml/badge.svg)](https://github.com/alexqqqqqq777/tauri-plugin-dragout/actions/workflows/ci.yml)
+[![License](https://img.shields.io/crates/l/tauri-plugin-dragout.svg)](#license)
 
 **Let users drag files _out_ of your Tauri 2 app**: onto Finder, the Desktop, Mail,
 Slack, Telegram or any other app. That works for files on disk, for bytes your
@@ -81,6 +83,10 @@ Typical uses:
 
 Platform: **macOS 10.13+** (`NSDraggingSession` + `NSFilePromiseProvider`). Windows and
 Linux are on the roadmap.
+
+Tested on an Apple Silicon Mac with Finder as the drop target: `file`, `data` and `promise`
+items arrive byte-for-byte, and the `dropped` and `ended` events fire. Reports from
+other apps and macOS versions are welcome in the issues.
 
 ## Install
 

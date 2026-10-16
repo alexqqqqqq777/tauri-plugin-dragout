@@ -3,7 +3,12 @@
   "version": "0.2.0",
   "description": "JavaScript API for tauri-plugin-dragout: native drag-out of files and generated content from a Tauri 2 webview.",
   "license": "MIT OR Apache-2.0",
-  "repository": "github:alexqqqqqq777/tauri-plugin-dragout",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexqqqqqq777/tauri-plugin-dragout.git"
+  },
+  "homepage": "https://github.com/alexqqqqqq777/tauri-plugin-dragout#readme",
+  "bugs": "https://github.com/alexqqqqqq777/tauri-plugin-dragout/issues",
   "type": "module",
   "main": "guest-js/index.js",
   "module": "guest-js/index.js",
