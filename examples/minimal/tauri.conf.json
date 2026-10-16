@@ -6,7 +6,7 @@
   "build": { "frontendDist": "dist" },
   "app": {
     "withGlobalTauri": true,
-    "windows": [{ "title": "Drag-out demo", "width": 560, "height": 420 }],
+    "windows": [{ "title": "Drag-out demo", "width": 560, "height": 420, "acceptFirstMouse": true }],
     "security": { "csp": null }
   },
   "bundle": { "active": false }

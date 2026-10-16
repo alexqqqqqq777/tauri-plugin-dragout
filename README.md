@@ -206,6 +206,9 @@ because the target receives the original file.
 * **The mouse button must be held** when the drag starts. Otherwise you get the error
   "no mouse button is pressed". Use `draggable()`, or call from `pointermove`.
 * **Add `user-select: none`** to draggable elements so that text selection does not fight the drag.
+* **Set `"acceptFirstMouse": true`** on the window in `tauri.conf.json`. Without it, the
+  first click on an inactive window only activates it, so the user has to click twice
+  before a drag starts, for example right after dropping a file into Finder.
 * **The target decides the file name on collisions.** Your writer gets the full
   destination path. Write exactly there.
 * **Some apps accept only real files**, not promises. Browsers and some Electron apps are
@@ -222,6 +225,9 @@ on the window's content view:
 * **`file` items** are plain `NSURL` pasteboard writers.
 * **All other items** are `NSFilePromiseProvider`s with a shared delegate. The delegate
   supplies the file name and the type (UTI from the file extension).
+* **Self-drops are blocked at the views.** WKWebView accepts a drop whatever the drag
+  source allows, so unless `allowSelfDrop` is set, the window's views stop accepting drops
+  while the drag runs and get their registration back when it ends.
 * **Writes run on a background `NSOperationQueue`.** When a write finishes, the delegate
   reports success, or an `NSError`, back to the drop target.
 * **Panics and Objective-C exceptions are caught** at the FFI boundary. They are reported
